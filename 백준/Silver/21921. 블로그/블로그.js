@@ -1,32 +1,35 @@
 let fs = require("fs");
+
 let input = fs.readFileSync("dev/stdin").toString().trim().split("\n");
 
-// 지난 일수 N 중 X일 동안 최대 방문자 수
 let [n, x] = input[0].split(" ").map(Number);
-let visitorCounts = input[1].split(" ").map(Number);
+let data = [0, ...input[1].split(" ").map(Number)];
 
-let ans = [0];
-
-let max = -1;
-// 첫번째 기간 방문자 초기화
-for (let i = 0; i < x; i++) {
-  ans[0] += visitorCounts[i];
-}
-max = Math.max(max, ans[0]);
-
-for (let i = 1; i < n - 1; i++) {
-  let prev = i - 1;
-  let next = i + (x - 1);
-  if (next >= n) break;
-
-  const value = ans[prev] - visitorCounts[prev] + visitorCounts[next];
-  ans[i] = value;
-  max = Math.max(max, ans[i]);
+let sum = 0;
+let start = 1;
+let end = x;
+for (let i = start; i <= end; i++) {
+  sum += data[i];
 }
 
-if (max === 0) {
-  console.log("SAD");
-} else {
-  console.log(max);
-  console.log(ans.filter((c) => c === max).length);
+let maxSum = sum;
+let count = 1; // 🔧 초기 윈도우 카운트 세는 것 누락했었음
+
+while (true) {
+  start += 1;
+  end += 1;
+  if (end > n) break;
+  sum = sum - data[start - 1] + data[end];
+  if (sum > maxSum) {
+    maxSum = sum;
+    count = 1;
+  } else if (sum === maxSum) {
+    count += 1;
+  }
+}
+
+if (maxSum === 0) console.log("SAD");
+else {
+  console.log(maxSum);
+  console.log(count);
 }
