@@ -1,26 +1,19 @@
 function solution(code) {
     let mode = 0;
-    let ret = ""
     const codeArr = [...code];
     
-    for(let i = 0; i<codeArr.length; i++){
-        if(mode === 0){
-            if(codeArr[i] !== "1"){
-                if(i % 2 === 0) ret += codeArr[i];
-            }else{
-                mode = 1;
-            }
-        }else{
-            if(codeArr[i] !== "1"){
-                if(i % 2 === 1) ret += codeArr[i];
-            }else{
-                mode = 0;
-            }
+    let ret = [...code].reduce((acc, value, idx) => {
+        if(value === "1"){
+            mode = mode === 0 ? 1 : 0;
         }
-    }
+        else if(idx % 2 === 0 && mode === 0){
+            return acc + value;
+        } else if(idx % 2 !== 0 && mode === 1){
+            return acc + value;
+        }
+        return acc;
+    }, "");
     
-    if(ret.length === 0) return "EMPTY";
-    
-    return ret;
+    return ret.length === 0 ? "EMPTY" : ret;
     
 }
