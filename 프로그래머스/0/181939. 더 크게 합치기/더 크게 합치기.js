@@ -1,6 +1,3 @@
 function solution(a, b) {
-    const first = Number("" + a + b);
-    const second = Number("" + b + a);
-    
-    return first >= second ? first : second;
+    return Math.max(Number(`${a}${b}`), Number(`${b}${a}`));
 }
