@@ -1,0 +1,57 @@
+// Node.js
+const fs = require("fs");
+
+const data = fs.readFileSync(0, "utf8").trim().split(/\s+/).map(Number);
+let idx = 0;
+
+const n = data[idx++];
+
+let park = Array.from({ length: n }, () =>
+  Array.from({ length: n }, () => data[idx++])
+);
+
+const dirs = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
+function countZeroNeighbors(prev, r, c) {
+  let cnt = 0;
+  for (const [dr, dc] of dirs) {
+    const nr = r + dr, nc = c + dc;
+    if (nr < 0 || nr >= n || nc < 0 || nc >= n) continue;
+    if (prev[nr][nc] === 0) cnt++;
+  }
+  return cnt;
+}
+
+function anyNonZero(grid) {
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (grid[i][j] !== 0) return true;
+    }
+  }
+  return false;
+}
+
+let days = 0;
+
+while (anyNonZero(park)) {
+  const prev = park;
+  const next = prev.map(row => row.slice());
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (prev[i][j] === 0) continue;
+      const dec = countZeroNeighbors(prev, i, j);
+      next[i][j] = Math.max(prev[i][j] - dec, 0);
+    }
+  }
+
+  park = next;
+  days++;
+}
+
+console.log(days);
