@@ -1,33 +1,30 @@
-function feeCalculator(parkingTime, feeTable){
-    const [기본시간, 기본요금, 단위시간, 단위요금] = feeTable;
-    if(parkingTime <= 기본시간) return 기본요금;
-    return 기본요금 + (Math.ceil((parkingTime - 기본시간) /단위시간) * 단위요금);
-}
-
 function solution(fees, records) {
-    const endOfDayTimestamp = 23 * 60 + 59;
-    
-    const totalTime = {};
-    const carInTimeMap = {};
+    // 출차가 없는 케이스를 디폴트로!!
+    const [기본시간, 기본요금, 단위시간, 단위요금] = fees;
+    const DAY_TIME = 23 * 60 + 59;
+    const carMap = new Map();
     
     for(const record of records){
-        const [time, car, type] = record.split(" ");
-        const [hour, min] = time.split(":").map(Number);
-        const timestamp = hour*60 + min;
+        const [timeStr, car, type] = record.split(" ");
+        const timeArr = timeStr.split(":").map(Number);
+        const timestamp = timeArr[0] * 60 + timeArr[1];
         if(type === "IN"){
-            carInTimeMap[car] = timestamp;
+            const base = carMap.get(car) ?? 0;
+            carMap.set(car, base + DAY_TIME - timestamp);
         }else{
-            totalTime[car] = (totalTime[car] ?? 0) + timestamp - carInTimeMap[car];
-            delete carInTimeMap[car];
+            const base = carMap.get(car) ?? 0;
+            carMap.set(car, base - DAY_TIME + timestamp);
         }
     }
     
-    Object.entries(carInTimeMap).forEach(([key, value]) => {
-        totalTime[key] = (totalTime[key] ?? 0) + endOfDayTimestamp - carInTimeMap[key];
-    })
+    const answer = [...carMap.entries()].sort().map(([car, time]) => {
+        const overflow = time - 기본시간;
+        if(overflow < 0) return 기본요금;
+        else{
+            return 기본요금 + Math.ceil(overflow / 단위시간) * 단위요금;
+        }
+    });
     
-
     
-    const answer = [...Object.entries(totalTime)].map(([car, time]) => [car, feeCalculator(time, fees)]).sort((a, b) => a[0] - b[0]).flatMap((cur) => cur[1]);
     return answer;
 }
