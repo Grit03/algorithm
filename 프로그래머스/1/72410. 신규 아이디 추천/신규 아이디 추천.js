@@ -1,12 +1,15 @@
 
 function solution(new_id) {
-    const answer = new_id
-        .toLowerCase() // 1
-        .replace(/[^\w-_.]/g, '') // 2
-        .replace(/\.+/g, '.') // 3
-        .replace(/^\.|\.$/g, '') // 4
-        .replace(/^$/g, 'a') // 5
-        .slice(0, 15).replace(/\.$/, ''); // 6
-    const len = answer.length;
-    return len > 2 ? answer : answer + answer.charAt(len - 1).repeat(3 - len);
+    const first = new_id.toLowerCase();
+    const second = first.match(/[a-z0-9\-_\.]/g).join("");
+    const third = second.replace(/[\.]{2,}/g, ".");
+    const fourth = third.replace(/^\.|\.$/g, "");
+    const fifth = fourth === "" ? "a" : fourth;
+    const sixth = fifth.length >= 16 ? fifth.slice(0, 15).replace(/^\.|\.$/, "") : fifth;
+    
+    const sixthLength = sixth.length;
+    const left = 3 - sixthLength;
+    const seventh = sixthLength <= 2 ? sixth + sixth.at(-1).repeat(left) : sixth;
+    
+    return seventh;
 }
